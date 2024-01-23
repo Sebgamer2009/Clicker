@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: lightblue;
+      font-family: Arial, sans-serif;
+    }
+
+    #container {
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #ball {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background-color: orange;
+      cursor: pointer;
+    }
+
+    #money {
+      font-size: 36px;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    #upgrades {
+      width: 300px;
+      height: 500px;
+      position: absolute;
+      top: 50%;
+      right: 50px;
+      transform: translateY(-50%);
+      overflow-y: auto;
+    }
+
+    .upgrade {
+      width: 100%;
+      height: 80px;
+      background-color: white;
+      border: 1px solid black;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .upgrade-name {
+      font-size: 24px;
+    }
+
+    .upgrade-cost {
+      font-size: 18px;
+      color: green;
+    }
+
+    .upgrade-bought {
+      background-color: gray;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <div id="ball"></div>
+    <div id="money">$0</div>
+  </div>
+  <div id="upgrades">
+    <!-- click upgrades -->
+    <div class="upgrade" id="upgrade-1">
+      <div class="upgrade-name">Click Boost</div>
+      <div class="upgrade-cost">$10</div>
+    </div>
+    <div class="upgrade" id="upgrade-2">
+      <div class="upgrade-name">Click Power</div>
+      <div class="upgrade-cost">$100</div>
+    </div>
+    <div class="upgrade" id="upgrade-3">
+      <div class="upgrade-name">Click Frenzy</div>
+      <div class="upgrade-cost">$1000</div>
+    </div>
+    <div class="upgrade" id="upgrade-4">
+      <div class="upgrade-name">Click Magnet</div>
+      <div class="upgrade-cost">$10000</div>
+    </div>
+    <div class="upgrade" id="upgrade-5">
+      <div class="upgrade-name">Click Master</div>
+      <div class="upgrade-cost">$100000</div>
+    </div>
+    <!-- auto click upgrades -->
+    <div class="upgrade" id="upgrade-6">
+      <div class="upgrade-name">Auto Clicker</div>
+      <div class="upgrade-cost">$50</div>
+    </div>
+    <div class="upgrade" id="upgrade-7">
+      <div class="upgrade-name">Auto Booster</div>
+      <div class="upgrade-cost">$500</div>
+    </div>
+    <div class="upgrade" id="upgrade-8">
+      <div class="upgrade-name">Auto Power</div>
+      <div class="upgrade-cost">$5000</div>
+    </div>
+    <div class="upgrade" id="upgrade-9">
+      <div class="upgrade-name">Auto Frenzy</div>
+      <div class="upgrade-cost">$50000</div>
+    </div>
+    <div class="upgrade" id="upgrade-10">
+      <div class="upgrade-name">Auto Master</div>
+      <div class="upgrade-cost">$500000</div>
+    </div>
+  </div>
+  <script>
+    // variables
+    let money = 0;
+    let moneyPerClick = 1;
+    let moneyPerSecond = 0;
+    let upgrades = [
+      {id: "upgrade-1", name: "Click Boost", cost: 10, type: "click", bonus: 0.1, bought: 0},
+      {id: "upgrade-2", name: "Click Power", cost: 100, type: "click", bonus: 1, bought: 0},
+      {id: "upgrade-3", name: "Click Frenzy", cost: 1000, type: "click", bonus: 10, bought: 0},
+      {id: "upgrade-4", name: "Click Magnet", cost: 10000, type: "click", bonus: 100, bought: 0},
+      {id: "upgrade-5", name: "Click Master", cost: 100000, type: "click", bonus: 1000, bought: 0},
+      {id: "upgrade-6", name: "Auto Clicker", cost: 50, type: "auto", bonus: 0.1, bought: 0},
+      {id: "upgrade-7", name: "Auto Booster", cost: 500, type: "auto", bonus: 1, bought: 0},
+      {id: "upgrade-8", name: "Auto Power", cost: 5000, type: "auto", bonus: 10, bought: 0},
+      {id: "upgrade-9", name: "Auto Frenzy", cost: 50000, type: "auto", bonus: 100, bought: 0},
+      {id: "upgrade-10", name: "Auto Master", cost: 500000, type: "auto", bonus: 1000, bought: 0},
+    ];
+
+    // elements
+    let ball = document.getElementById("ball");
+    let moneyDisplay = document.getElementById("money");
+    let upgradeElements = document.getElementsByClassName("upgrade");
+
+    // functions
+    function formatMoney(m) {
+      return "$" + m.toFixed(2);
+    }
+
+    function updateMoney() {
+      moneyDisplay.innerText = formatMoney(money);
+    }
+
+    function addMoney(m) {
+      money += m;
+      updateMoney();
+    }
+
+    function buyUpgrade(u) {
+      if (money >= u.cost) {
+        money -= u.cost;
+        u.bought++;
+        if (u.type == "click") {
+          moneyPerClick += u.bonus;
+        } else if (u.type == "auto") {
+          moneyPerSecond += u.bonus;
+        }
+        updateMoney();
+        updateUpgrades();
+      }
+    }
+
+    function updateUpgrades() {
+      for (let i = 0; i < upgrades.length; i++) {
+        let u = upgrades[i];
+        let e = document.getElementById(u.id);
+        if (u.bought > 0) {
+          e.classList.add("upgrade-bought");
+          e.querySelector(".upgrade-name").innerText = u.name + " x" + u.bought;
+        } else {
+          if (money >= u.cost) {
+            e.classList.remove("upgrade-bought");
+          } else {
+            e.classList.add("upgrade-bought");
+          }
+        }
+      }
+    }
+
+    // events
+    ball.onclick = function() {
+      addMoney(moneyPerClick);
+    };
+
+    for (let i = 0; i < upgradeElements.length; i++) {
+      let e = upgradeElements[i];
+      e.onclick = function() {
+        let u = upgrades.find(u => u.id == e.id);
+        buyUpgrade(u);
+      };
+    }
+
+    // loop
+    setInterval(function() {
+      addMoney(moneyPerSecond / 10);
+    }, 100);
+  </script>
+</body>
+</html>
